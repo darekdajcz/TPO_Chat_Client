@@ -3,7 +3,6 @@ package com.example.tpo_chatappclient;
 import javafx.scene.layout.VBox;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Client {
@@ -39,19 +38,16 @@ public class Client {
     }
 
     public void receiveMessageFromServer(VBox vbox_messages) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (socket.isConnected()) {
-                    try {
-                        String messageFromServer = bufferedReader.readLine();
-                        ClientController.addLabel(messageFromServer, vbox_messages);
-                    } catch (IOException e) {
-                        System.out.println("Error reciveing message from the sever");
-                        e.printStackTrace();
-                        closeEverything(socket, bufferedReader, bufferedWriter);
-                        break;
-                    }
+        new Thread(() -> {
+            while (socket.isConnected()) {
+                try {
+                    String messageFromServer = bufferedReader.readLine();
+                    ClientController.addLabel(messageFromServer, vbox_messages);
+                } catch (IOException e) {
+                    System.out.println("Error reciveing message from the sever");
+                    e.printStackTrace();
+                    closeEverything(socket, bufferedReader, bufferedWriter);
+                    break;
                 }
             }
         }).start();

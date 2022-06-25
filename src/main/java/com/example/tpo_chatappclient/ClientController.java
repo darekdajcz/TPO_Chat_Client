@@ -20,7 +20,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -39,45 +38,37 @@ public class ClientController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            client = new Client(new Socket("localhost",1234));
+            client = new Client(new Socket("localhost",4200));
             System.out.println("Connected to server");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error creating server");
         }
 
-        vbox_messages.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                sp_main.setVvalue((Double) t1);
-            }
-        });
+        vbox_messages.heightProperty().addListener((observableValue, number, t1) -> sp_main.setVvalue((Double) t1));
 
         client.receiveMessageFromServer(vbox_messages);
 
-        button_send.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                String messageToSend = tf_message.getText();
-                if(!messageToSend.isEmpty()) {
-                    HBox hBox = new HBox();
-                    hBox.setAlignment(Pos.CENTER_RIGHT);
-                    hBox.setPadding(new Insets(5,5,5,10));
-                    Text text = new Text(messageToSend);
-                    TextFlow textFlow = new TextFlow(text);
+        button_send.setOnAction(actionEvent -> {
+            String messageToSend = tf_message.getText();
+            if(!messageToSend.isEmpty()) {
+                HBox hBox = new HBox();
+                hBox.setAlignment(Pos.CENTER_RIGHT);
+                hBox.setPadding(new Insets(5));
+                Text text = new Text(messageToSend);
+                TextFlow textFlow = new TextFlow(text);
 
-                    textFlow.setStyle("-fx-color: rgb(239,242,255); " +
-                            "-fx-background-color: rgb(15, 125, 242);" +
-                            "-fx-background-radius: 20px");
-                    textFlow.setPadding(new Insets(5,5,5,10));
-                    text.setFill(Color.color(0.934,0.945,0.966));
+                textFlow.setStyle("-fx-color: rgb(239,242,255); " +
+                        "-fx-background-color: rgb(253,160,25);" +
+                        "-fx-background-radius: 20px");
+                textFlow.setPadding(new Insets(5,5,5,10));
+                text.setFill(Color.color(0.934,0.945,0.966));
 
-                    hBox.getChildren().add(textFlow);
-                    vbox_messages.getChildren().add(hBox);
+                hBox.getChildren().add(textFlow);
+                vbox_messages.getChildren().add(hBox);
 
-                    client.sendMessageToServer(messageToSend);
-                    tf_message.clear();
-                }
+                client.sendMessageToServer(messageToSend);
+                tf_message.clear();
             }
         });
     }
@@ -85,22 +76,17 @@ public class ClientController implements Initializable {
     public static void addLabel(String messageFromServer, VBox vbox) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5,5,5,10));
+        hBox.setPadding(new Insets(5));
 
         Text text = new Text(messageFromServer);
         TextFlow textFlow = new TextFlow(text);
 
-        textFlow.setStyle("-fx-background-color: rgb(233, 233, 235);" +
+        textFlow.setStyle("-fx-background-color: rgb(223,223,241);" +
                 "-fx-background-radius: 20px");
         textFlow.setPadding(new Insets(5,5,5,10));
         hBox.getChildren().add(textFlow);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                vbox.getChildren().add(hBox);
-            }
-        });
+        Platform.runLater(() -> vbox.getChildren().add(hBox));
 
     }
 }
